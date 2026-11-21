@@ -1628,35 +1628,36 @@ label.chk input { width: 18px; height: 18px; }
 .tpane.open.fullscreen.immersive .ph h2 { display: none; }
 .tpane.open.fullscreen.immersive .ph .iconbtn { opacity: .35; height: 36px; min-width: 36px; padding: 0 8px; border-radius: 50%; }
 .tpane.open.fullscreen.immersive .ph #t-fs { display: none; }
-/* ---------- Écran partagé : chaque espace Bcode est une colonne verticale qui défile (outils > code > rendu) ---------- */
+/* ---------- Écran partagé : chaque espace Bcode est une colonne verticale qui défile (outils > code > rendu), forcée même au-delà de 1100 px ---------- */
 html.is-pane #b-multi { display: none; }
 #b-multi[aria-pressed="true"] { color: #c9faff; border-color: rgba(34, 211, 238, .55); background: rgba(34, 211, 238, .14); }
 body.multi { display: flex; height: 100vh; height: 100dvh; overflow: hidden; }
-body.multi > .app { flex: 1 1 0; min-width: 0; min-height: 0; max-width: none; width: auto; height: auto; margin: 0; padding: 8px 10px 8px; gap: 10px; overflow-x: hidden; overflow-y: auto; }
+body.multi > .app { flex: 1 1 0; min-width: 0; min-height: 0; max-width: none !important; width: auto !important; height: auto; margin: 0; padding: 8px 10px 8px !important; gap: 10px !important; overflow-x: hidden; overflow-y: auto; }
 .pane-col { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid var(--edge); }
 .pane-bar { flex: none; display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 6px 0 12px; font-size: 12px; font-weight: 600; color: var(--dim); background: var(--surface-header); border-bottom: var(--border-subtle); }
 .pane-t { flex: 1; min-width: 0; }
 .pane-x { width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dim); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
 .pane-x:hover { color: var(--text); background: var(--glass2); }
 .pane-frame { flex: 1 1 auto; width: 100%; min-height: 0; border: 0; background: var(--bg); color-scheme: dark; }
-/* Colonne verticale : tout s'empile et la colonne défile, rien n'est coupé */
-body.multi .workspace { display: flex; flex-direction: column; flex: 0 0 auto; min-height: 0; gap: 10px; }
-body.multi .workspace > .left-rail { order: 1; flex: 0 0 auto; max-height: none; min-height: 0; overflow: visible; padding-right: 0; gap: 8px; }
-body.multi .workspace > .editor-column { order: 2; flex: 0 0 auto; height: auto; min-height: 0; }
-body.multi .editor-column .code { flex: none; height: 40vh; height: 40dvh; min-height: 260px; max-height: none; }
-body.multi #b-flip { display: none; }
+/* Colonne verticale : tout s'empile et la colonne défile, rien n'est coupé (prioritaire sur la grille à 3 colonnes) */
+body.multi .workspace, html.is-pane .workspace { display: flex !important; flex-direction: column !important; grid-template-columns: none !important; flex: 0 0 auto; min-height: 0; gap: 10px !important; }
+body.multi .workspace > *, html.is-pane .workspace > * { order: 0; }
+body.multi .workspace > .left-rail, html.is-pane .workspace > .left-rail { order: 1; flex: 0 0 auto; max-height: none !important; min-height: 0; overflow: visible !important; padding-right: 0; gap: 8px; }
+body.multi .workspace > .editor-column, html.is-pane .workspace > .editor-column { order: 2 !important; flex: 0 0 auto; height: auto !important; min-height: 0; }
+body.multi .editor-column .code, html.is-pane .editor-column .code { flex: none !important; height: 40vh !important; height: 40dvh !important; min-height: 260px !important; max-height: none !important; }
+body.multi #b-flip, html.is-pane #b-flip { display: none !important; }
 /* Raccourcis sur une seule ligne, boutons plus compacts */
-body.multi .left-rail .quick { flex-wrap: nowrap; }
-body.multi .left-rail .qb { flex: 1 1 0; min-height: 50px; }
-body.multi .left-rail .btn.hero { min-height: 48px; }
+body.multi .left-rail .quick, html.is-pane .left-rail .quick { flex-wrap: nowrap !important; }
+body.multi .left-rail .qb, html.is-pane .left-rail .qb { flex: 1 1 0 !important; min-height: 50px; }
+body.multi .left-rail .btn.hero, html.is-pane .left-rail .btn.hero { min-height: 48px; }
 /* Le rendu reste toujours visible, sous le champ code, en grand */
-body.multi .workspace > #tdlg { display: flex !important; flex-direction: column; order: 3; position: relative; flex: 0 0 auto; height: 75vh; height: 75dvh; min-height: 360px; margin: 0; padding: 6px; overflow: hidden; }
-body.multi .workspace > #tdlg::before { display: none; }
-body.multi .workspace > #tdlg #tframe { display: block; flex: 1 1 auto; width: 100%; height: 0; min-height: 0; margin: 0; border: 1px solid #343b49; border-radius: 14px; }
+body.multi .workspace > #tdlg, html.is-pane .workspace > #tdlg { display: flex !important; flex-direction: column; order: 3 !important; position: relative; flex: 0 0 auto; height: 75vh; height: 75dvh; min-height: 360px; margin: 0; padding: 6px; overflow: hidden; }
+body.multi .workspace > #tdlg::before, html.is-pane .workspace > #tdlg::before { display: none !important; }
+body.multi .workspace > #tdlg #tframe, html.is-pane .workspace > #tdlg #tframe { display: block; flex: 1 1 auto; width: 100%; height: 0; min-height: 0; margin: 0; border: 1px solid #343b49; border-radius: 14px; }
 /* Code replié : le rendu prend la place libérée */
-body.multi .workspace.code-folded > #tdlg { height: 90vh; height: 90dvh; }
-body.multi .workspace > #tdlg.open.fullscreen { position: fixed; inset: 0; z-index: 9999; order: 0; width: 100vw; height: 100vh; height: 100dvh; min-height: 0; max-height: none; padding: 0; border-radius: 0; }
-body.multi .workspace > #tdlg.open.fullscreen #tframe { border: 0; border-radius: 0; }
+body.multi .workspace.code-folded > #tdlg, html.is-pane .workspace.code-folded > #tdlg { height: 90vh; height: 90dvh; }
+body.multi .workspace > #tdlg.open.fullscreen, html.is-pane .workspace > #tdlg.open.fullscreen { position: fixed; inset: 0; z-index: 9999; order: 0 !important; width: 100vw; height: 100vh; height: 100dvh; min-height: 0; max-height: none; padding: 0; border-radius: 0; }
+body.multi .workspace > #tdlg.open.fullscreen #tframe, html.is-pane .workspace > #tdlg.open.fullscreen #tframe { border: 0; border-radius: 0; }
 @media (max-width: 700px) {
   body.multi { flex-direction: column; }
   .pane-col { border-left: 0; border-top: 1px solid var(--edge); }
@@ -3322,6 +3323,11 @@ const PANE = (() => {
     return n === '2' || n === '3' ? n : '';
   } catch (e) { return ''; }
 })();
+/* Un espace secondaire est vertical dès le départ, avant le premier dessin */
+if (PANE) {
+  document.documentElement.classList.add('is-pane');
+  document.body.classList.add('multi');
+}
 const MULTI_KEY = 'blocs.multi';
 /* Canal entre les espaces : un projet écrit ici est relu par les autres */
 const paneBus = (() => {
