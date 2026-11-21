@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#05070b">
 <meta name="color-scheme" content="dark">
-<title>ljyglggylg</title>
+<title>Qwen Bcode PC</title>
 <style>
 /* Cyber glass : fond uni, verre translucide, filets cyan */
 :root {
@@ -983,6 +983,14 @@ textarea::placeholder {
 .code-q-count:empty { display: none; }
 #code-q-x { display: none; }
 .code-search.has-q #code-q-x { display: inline-flex; }
+/* Champ code replié : seule la barre de recherche (avec le bouton ▾ / ▸) reste visible */
+#b-code-fold { font-size: 14px; }
+.editor-column.code-folded > section.code { display: none; }
+@media (min-width: 1100px) {
+  .workspace.code-folded { grid-template-columns: minmax(230px, 260px) minmax(220px, 340px) minmax(340px, 1fr); }
+  .workspace.flipped.code-folded { grid-template-columns: minmax(230px, 260px) minmax(340px, 1fr) minmax(220px, 340px); }
+  .workspace.code-folded > .editor-column { height: auto; align-self: start; }
+}
 /* Surlignage des mots trouvés par la recherche dans le code */
 .code-hl {
   background: rgba(251, 191, 36, .22);
@@ -1639,18 +1647,18 @@ body.multi > .app { flex: 1 1 0; min-width: 0; min-height: 0; max-width: none; w
 .pane-x { width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dim); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
 .pane-x:hover { color: var(--text); background: var(--glass2); }
 .pane-frame { flex: 1 1 auto; width: 100%; min-height: 0; border: 0; background: var(--bg); color-scheme: dark; }
-/* L'espace principal reprend la mise en page « tablette » : sa largeur n'est plus celle de la fenêtre */
+/* L'espace principal reprend une mise en page empilée : sa largeur n'est plus celle de la fenêtre */
 body.multi .workspace { display: flex; flex-direction: column; flex: 0 0 auto; gap: 12px; }
-body.multi .workspace.flipped > * { order: 0; }
-body.multi .left-rail { max-height: none; overflow: visible; padding-right: 0; }
-body.multi .editor-column { height: auto; }
-body.multi .editor-column .code { flex: none; height: auto; min-height: 260px; max-height: 54vh; max-height: 54dvh; }
+body.multi .workspace > .left-rail { order: 1; max-height: none; overflow: visible; padding-right: 0; }
+body.multi .workspace > .editor-column { order: 2; height: auto; }
+body.multi .editor-column .code { flex: none; height: 34vh; height: 34dvh; min-height: 200px; max-height: none; }
 body.multi #b-flip { display: none; }
-body.multi .workspace > #tdlg { display: none !important; }
-body.multi .workspace > #tdlg.open { display: block !important; }
-body.multi .workspace > #tdlg.open.fullscreen { display: flex !important; }
+/* L'aperçu reste toujours visible, juste sous le champ code */
+body.multi .workspace > #tdlg { display: flex !important; flex-direction: column; order: 3; position: relative; flex: 0 0 auto; height: 42vh; height: 42dvh; min-height: 240px; margin: 0; padding: 8px; overflow: hidden; }
 body.multi .workspace > #tdlg::before { display: none; }
-body.multi .workspace > #tdlg #tframe { height: 46vh; min-height: 0; }
+body.multi .workspace > #tdlg #tframe { display: block; flex: 1 1 auto; width: 100%; height: 0; min-height: 0; margin: 0; border: 1px solid #343b49; border-radius: 14px; }
+body.multi .workspace > #tdlg.open.fullscreen { position: fixed; inset: 0; z-index: 9999; order: 0; width: 100vw; height: 100vh; height: 100dvh; min-height: 0; max-height: none; padding: 0; border-radius: 0; }
+body.multi .workspace > #tdlg.open.fullscreen #tframe { border: 0; border-radius: 0; }
 @media (max-width: 700px) {
   body.multi { flex-direction: column; }
   .pane-col { border-left: 0; border-top: 1px solid var(--edge); }
@@ -1797,6 +1805,7 @@ body.multi .workspace > #tdlg #tframe { height: 46vh; min-height: 0; }
 
     <section class="editor-column">
 <div class="code-search" id="code-search">
+  <button class="iconbtn" id="b-code-fold" aria-label="Replier le champ code" aria-expanded="true" title="Replier le champ code">▾</button>
   <svg class="ic" style="width:15px;height:15px;opacity:.6;flex:none" aria-hidden="true"><use href="#i-goto"/></svg>
   <input type="search" id="code-q" placeholder="Rechercher dans le code…" autocomplete="off" spellcheck="false">
   <span id="code-q-count" class="code-q-count" aria-live="polite"></span>
@@ -5701,6 +5710,43 @@ function codeSearchClear() {
   codeSearchUpdate(false);
   input.focus();
 }
+/* Le repli du champ code est mémorisé séparément pour chaque espace Bcode */
+function codeFoldKey() {
+  return 'blocs.codefold' + (PANE ? '.' + PANE : '');
+}
+function codeFoldSet(on, noSave) {
+  const col = document.querySelector('.editor-column');
+  const ws = document.querySelector('.workspace');
+  const b = $('b-code-fold');
+  if (col) col.classList.toggle('code-folded', on);
+  if (ws) ws.classList.toggle('code-folded', on);
+  if (b) {
+    b.setAttribute('aria-expanded', on ? 'false' : 'true');
+    b.textContent = on ? '▸' : '▾';
+    b.title = on ? 'Déplier le champ code' : 'Replier le champ code';
+    b.setAttribute('aria-label', b.title);
+  }
+  if (!noSave) {
+    try { localStorage.setItem(codeFoldKey(), on ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
+  }
+  /* Le champ était masqué : la coloration est redessinée à la bonne taille */
+  if (!on && hlLines.length) requestAnimationFrame(() => hlPaint(true));
+}
+function codeFoldToggle() {
+  const col = document.querySelector('.editor-column');
+  codeFoldSet(!(col && col.classList.contains('code-folded')));
+}
+$('b-code-fold').onclick = codeFoldToggle;
+/* Chercher dans le code déplie le champ : les occurrences doivent être visibles */
+$('code-q').addEventListener('focus', () => {
+  const col = document.querySelector('.editor-column');
+  if (col && col.classList.contains('code-folded')) codeFoldSet(false);
+});
+(function codeFoldInit() {
+  let on = false;
+  try { on = localStorage.getItem(codeFoldKey()) === '1'; } catch (e) { /* stockage indisponible */ }
+  codeFoldSet(on, true);
+})();
 $('split-q').addEventListener('input', () => {
   splitQuery = $('split-q').value;
   renderSplitParts();
