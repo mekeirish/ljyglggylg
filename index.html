@@ -983,12 +983,6 @@ textarea::placeholder {
 .code-q-count:empty { display: none; }
 #code-q-x { display: none; }
 .code-search.has-q #code-q-x { display: inline-flex; }
-/* Champ code replié (vertical) : seule la barre de recherche, avec le bouton ▾ / ▸, reste visible */
-#b-code-fold { font-size: 14px; }
-.editor-column.code-folded > section.code { display: none; }
-@media (min-width: 1100px) {
-  .workspace.code-folded > .editor-column { height: auto; align-self: start; }
-}
 /* Surlignage des mots trouvés par la recherche dans le code */
 .code-hl {
   background: rgba(251, 191, 36, .22);
@@ -1634,28 +1628,33 @@ label.chk input { width: 18px; height: 18px; }
 .tpane.open.fullscreen.immersive .ph h2 { display: none; }
 .tpane.open.fullscreen.immersive .ph .iconbtn { opacity: .35; height: 36px; min-width: 36px; padding: 0 8px; border-radius: 50%; }
 .tpane.open.fullscreen.immersive .ph #t-fs { display: none; }
-/* ---------- Écran partagé : chaque espace Bcode tient dans la fenêtre, code en haut, rendu dessous (vertical) ---------- */
+/* ---------- Écran partagé : chaque espace Bcode est une colonne verticale qui défile (outils > code > rendu) ---------- */
 html.is-pane #b-multi { display: none; }
 #b-multi[aria-pressed="true"] { color: #c9faff; border-color: rgba(34, 211, 238, .55); background: rgba(34, 211, 238, .14); }
 body.multi { display: flex; height: 100vh; height: 100dvh; overflow: hidden; }
-body.multi > .app { flex: 1 1 0; min-width: 0; min-height: 0; max-width: none; width: auto; height: auto; margin: 0; padding: 8px 10px 6px; gap: 8px; overflow: hidden; }
+body.multi > .app { flex: 1 1 0; min-width: 0; min-height: 0; max-width: none; width: auto; height: auto; margin: 0; padding: 8px 10px 8px; gap: 10px; overflow-x: hidden; overflow-y: auto; }
 .pane-col { position: relative; z-index: 1; flex: 1 1 0; min-width: 0; min-height: 0; display: flex; flex-direction: column; border-left: 1px solid var(--edge); }
 .pane-bar { flex: none; display: flex; align-items: center; gap: 8px; height: 28px; padding: 0 6px 0 12px; font-size: 12px; font-weight: 600; color: var(--dim); background: var(--surface-header); border-bottom: var(--border-subtle); }
 .pane-t { flex: 1; min-width: 0; }
 .pane-x { width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--dim); font: inherit; font-size: 16px; line-height: 1; cursor: pointer; }
 .pane-x:hover { color: var(--text); background: var(--glass2); }
 .pane-frame { flex: 1 1 auto; width: 100%; min-height: 0; border: 0; background: var(--bg); color-scheme: dark; }
-/* Colonne verticale : outils (défilables) > code > rendu, le tout dans la hauteur de l'écran */
-body.multi .workspace { display: flex; flex-direction: column; flex: 1 1 0; min-height: 0; gap: 8px; }
-body.multi .workspace > .left-rail { order: 1; flex: 0 1 auto; max-height: 30vh; max-height: 30dvh; min-height: 0; overflow-x: hidden; overflow-y: auto; padding-right: 0; }
-body.multi .workspace > .editor-column { order: 2; flex: 1 1 0; min-height: 0; height: auto; }
-body.multi .workspace.code-folded > .editor-column { flex: 0 0 auto; }
-body.multi .editor-column .code { flex: 1 1 0; height: auto; min-height: 90px; max-height: none; }
+/* Colonne verticale : tout s'empile et la colonne défile, rien n'est coupé */
+body.multi .workspace { display: flex; flex-direction: column; flex: 0 0 auto; min-height: 0; gap: 10px; }
+body.multi .workspace > .left-rail { order: 1; flex: 0 0 auto; max-height: none; min-height: 0; overflow: visible; padding-right: 0; gap: 8px; }
+body.multi .workspace > .editor-column { order: 2; flex: 0 0 auto; height: auto; min-height: 0; }
+body.multi .editor-column .code { flex: none; height: 40vh; height: 40dvh; min-height: 260px; max-height: none; }
 body.multi #b-flip { display: none; }
-/* Le rendu reste toujours visible, sous le champ code */
-body.multi .workspace > #tdlg { display: flex !important; flex-direction: column; order: 3; position: relative; flex: 1 1 0; height: auto; min-height: 140px; margin: 0; padding: 6px; overflow: hidden; }
+/* Raccourcis sur une seule ligne, boutons plus compacts */
+body.multi .left-rail .quick { flex-wrap: nowrap; }
+body.multi .left-rail .qb { flex: 1 1 0; min-height: 50px; }
+body.multi .left-rail .btn.hero { min-height: 48px; }
+/* Le rendu reste toujours visible, sous le champ code, en grand */
+body.multi .workspace > #tdlg { display: flex !important; flex-direction: column; order: 3; position: relative; flex: 0 0 auto; height: 75vh; height: 75dvh; min-height: 360px; margin: 0; padding: 6px; overflow: hidden; }
 body.multi .workspace > #tdlg::before { display: none; }
 body.multi .workspace > #tdlg #tframe { display: block; flex: 1 1 auto; width: 100%; height: 0; min-height: 0; margin: 0; border: 1px solid #343b49; border-radius: 14px; }
+/* Code replié : le rendu prend la place libérée */
+body.multi .workspace.code-folded > #tdlg { height: 90vh; height: 90dvh; }
 body.multi .workspace > #tdlg.open.fullscreen { position: fixed; inset: 0; z-index: 9999; order: 0; width: 100vw; height: 100vh; height: 100dvh; min-height: 0; max-height: none; padding: 0; border-radius: 0; }
 body.multi .workspace > #tdlg.open.fullscreen #tframe { border: 0; border-radius: 0; }
 @media (max-width: 700px) {
@@ -1764,14 +1763,13 @@ body.multi .workspace > #tdlg.open.fullscreen #tframe { border: 0; border-radius
         <button class="btn hero" id="b-main"><svg class="ic"><use href="#i-zap"/></svg><span id="b-main-t">Analyser</span></button>
       </div>
 
-<div class="quick">
-  <button class="qb red" id="qb-need" aria-label="Blocs demandés"><svg class="ic"><use href="#i-swap"/></svg>Dem.</button>
-  <button class="qb" id="qb-index" aria-label="Copier l'index des blocs"><svg class="ic"><use href="#i-folder"/></svg>Index</button>
-  <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg>Bal</button>
-  <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg>Prompt</button>
-  <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg>P+C</button>
-  <button class="qb warn" id="qb-proj" aria-label="Ouvrir les projets"><svg class="ic"><use href="#i-file"/></svg>Proj.</button>
-</div>
+      <div class="quick">
+        <button class="qb red" id="qb-need" aria-label="Blocs demandés"><svg class="ic"><use href="#i-swap"/></svg>Dem.</button>
+        <button class="qb cyan" id="qb-marked" aria-label="Copier le code balisé"><svg class="ic"><use href="#i-braces"/></svg>Bal</button>
+        <button class="qb" id="qb-prompt" aria-label="Copier le prompt seul"><svg class="ic"><use href="#i-copy"/></svg>Prompt</button>
+        <button class="qb cyan" id="qb-all" aria-label="Copier le prompt et le code balisé"><svg class="ic"><use href="#i-zap"/></svg>P+C</button>
+        <button class="qb warn" id="qb-proj" aria-label="Ouvrir les projets"><svg class="ic"><use href="#i-file"/></svg>Proj.</button>
+      </div>
 
       <div class="grid">
         <button class="btn small" id="b-test"><svg class="ic"><use href="#i-play"/></svg>Tester</button>
@@ -1805,7 +1803,6 @@ body.multi .workspace > #tdlg.open.fullscreen #tframe { border: 0; border-radius
 
     <section class="editor-column">
 <div class="code-search" id="code-search">
-  <button class="iconbtn" id="b-code-fold" aria-label="Replier le champ code" aria-expanded="true" title="Replier le champ code">▾</button>
   <svg class="ic" style="width:15px;height:15px;opacity:.6;flex:none" aria-hidden="true"><use href="#i-goto"/></svg>
   <input type="search" id="code-q" placeholder="Rechercher dans le code…" autocomplete="off" spellcheck="false">
   <span id="code-q-count" class="code-q-count" aria-live="polite"></span>
@@ -5710,43 +5707,6 @@ function codeSearchClear() {
   codeSearchUpdate(false);
   input.focus();
 }
-/* Le repli du champ code est mémorisé séparément pour chaque espace Bcode */
-function codeFoldKey() {
-  return 'blocs.codefold' + (PANE ? '.' + PANE : '');
-}
-function codeFoldSet(on, noSave) {
-  const col = document.querySelector('.editor-column');
-  const ws = document.querySelector('.workspace');
-  const b = $('b-code-fold');
-  if (col) col.classList.toggle('code-folded', on);
-  if (ws) ws.classList.toggle('code-folded', on);
-  if (b) {
-    b.setAttribute('aria-expanded', on ? 'false' : 'true');
-    b.textContent = on ? '▸' : '▾';
-    b.title = on ? 'Déplier le champ code' : 'Replier le champ code';
-    b.setAttribute('aria-label', b.title);
-  }
-  if (!noSave) {
-    try { localStorage.setItem(codeFoldKey(), on ? '1' : '0'); } catch (e) { /* stockage indisponible */ }
-  }
-  /* Le champ était masqué : la coloration est redessinée à la bonne taille */
-  if (!on && hlLines.length) requestAnimationFrame(() => hlPaint(true));
-}
-function codeFoldToggle() {
-  const col = document.querySelector('.editor-column');
-  codeFoldSet(!(col && col.classList.contains('code-folded')));
-}
-$('b-code-fold').onclick = codeFoldToggle;
-/* Chercher dans le code déplie le champ : les occurrences doivent être visibles */
-$('code-q').addEventListener('focus', () => {
-  const col = document.querySelector('.editor-column');
-  if (col && col.classList.contains('code-folded')) codeFoldSet(false);
-});
-(function codeFoldInit() {
-  let on = false;
-  try { on = localStorage.getItem(codeFoldKey()) === '1'; } catch (e) { /* stockage indisponible */ }
-  codeFoldSet(on, true);
-})();
 $('split-q').addEventListener('input', () => {
   splitQuery = $('split-q').value;
   renderSplitParts();
@@ -5858,11 +5818,6 @@ $('qb-prompt').onclick = () => copyText(PROMPT_TEXT, 'Prompt copié ✓');
 $('qb-all').onclick = () => copyAllForAI();
 $('qb-proj').onclick = () => { closeOv('adv'); renderCloudDialog(); openOv('clouddlg'); };
 $('qb-need').onclick = copyRequested;
-$('qb-index').onclick = () => {
-  const v = $('src').value;
-  if (!parseMarks(v).blocks.length) { notify('Code non balisé : touchez « Analyser »', { kind: 'err' }); return; }
-  copyText(buildIndex(v), 'Index copié ✓');
-};
 /* Dessine la liste des projets dans la modale de sélection (cartes cliquables) */
 function renderProjSel() {
   $('plist3').innerHTML = projects.list.map(p =>
@@ -7492,9 +7447,7 @@ if (paneBus) {
   };
 }
 if (PANE) {
-  /* Les espaces secondaires utilisent la même mise en page verticale que l'espace principal */
   document.documentElement.classList.add('is-pane');
-  document.body.classList.add('multi');
   try { localStorage.setItem('blocs.cur.' + PANE, projects.cur); } catch (e) { /* stockage indisponible */ }
 } else {
   $('b-multi').onclick = paneAdd;
